@@ -37,7 +37,7 @@
 			var urlParams = new URLSearchParams(window.location.search);
 			urlParams.delete('date');
 			urlParams.append('date', $("#datepicker").val());
-			window.location.href = 'mapbox.htm?' + urlParams.toString();
+			window.location.href = window.location.pathname + '?' + urlParams.toString();
 		});
       });
   </script>
