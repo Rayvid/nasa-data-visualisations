@@ -53,7 +53,7 @@
     mapboxgl.accessToken = 'pk.eyJ1IjoiYmFuYW5hc2EiLCJhIjoiY2sxd2gzb2RhMDFtbTNscGc4ZTljand5ayJ9.v5zgfYiieJkyambXSqo-Sw';
     var map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v11?optimize=true',
+      style: 'mapbox://styles/mapbox/light-v10?optimize=true',
       center: [-118.22688, 34.06659],
       zoom: 8
     });
@@ -72,60 +72,52 @@
 	  maxzoom: 15,
 	  paint: {
 		// increase weight as diameter breast height increases
-		'heatmap-weight': {
-		  property: 'dbh',
-		  type: 'exponential',
-		  stops: [
-			[1, 0],
-			[1000, 1]
-		  ]
-		},
+		'heatmap-weight': 1,
 		// increase intensity as zoom level increases
-		'heatmap-intensity': {
-		  stops: [
-			[11, 1],
-			[15, 3]
-		  ]
-		},
+		'heatmap-intensity': 1,
 		// assign color values be applied to points depending on their density
 		'heatmap-color': [
 		  'interpolate',
 		  ['linear'],
 		  ['heatmap-density'],
-		  0, 'rgba(236,222,239,0)',
-		  0.2, 'rgb(208,209,230)',
-		  0.5, 'rgb(220,150,200)',
-		  0.7, 'rgb(240,120,180)',
-		  0.9, 'rgb(255,100,100)'
+		  0, 'rgba(0, 0, 255, 0)',
+		  0.2, 'royalblue',
+		  0.3, 'cyan',
+		  0.5, 'lime',
+		  0.7, 'yellow',
+		  1, 'red'
 		],
 		// increase radius as zoom increases
-		'heatmap-radius': {
-		  stops: [
-		    [1, 10],
-			[10, 15],
-			[15, 20]
+		'heatmap-radius': [
+			'interpolate',
+			['linear'],
+			['get','dbh'],
+			200,
+			10,
+			300,
+			20,
+			400,
+			30,
+			500,
+			40
 		  ]
-		},
+		,
 		// decrease opacity to transition into the circle layer
-		'heatmap-opacity': {
-		  default: 0.5,
-		  stops: [
-			[0, 0.5],
-			[2, 0.7],
-			[5, 1],
-		  ]
-		},
+		'heatmap-opacity': [
+		  'interpolate',
+		  ['linear'],
+		  ['zoom'],
+		  0,
+		  0.5,
+		  22,
+		  0.9
+		],
 	  }
 	}, 'waterway-label');
 
   // add circle layer here
 	});
-	map.on('click', 'trees-point', function(e) {
-	  new mapboxgl.Popup()
-		.setLngLat(e.features[0].geometry.coordinates)
-		.setHTML('<b>DBH:</b> ' + e.features[0].properties.dbh)
-		.addTo(map);
-	});
+
 
   </script>
 </body>
