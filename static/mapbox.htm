@@ -18,9 +18,36 @@
         bottom: 0;
         width: 100%;
       }
+	  
+	  .mapcontrol {
+		position: absolute;
+		z-index: 10;
+	  }
     </style>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+      $(() => {
+		$("#datepicker").datepicker();
+        $("#datepicker").datepicker("option", "dateFormat", "yy-mm-dd");
+		var urlParams = new URLSearchParams(window.location.search);
+		$("#datepicker").val(urlParams.get('date') || '2016-02-14');
+		$("#datepicker").change(function() {
+			var urlParams = new URLSearchParams(window.location.search);
+			urlParams.delete('date');
+			urlParams.append('date', $("#datepicker").val());
+			window.location.href = 'mapbox.htm?' + urlParams.toString();
+		});
+      });
+  </script>
 </head>
 <body>
+  <div class="mapcontrol" style="top:20px;left:20px">
+    Date:
+	<input type="text" id="datepicker" size="30">
+  </div>
+	
   <div id='map'></div>
   <script>
     mapboxgl.accessToken = 'pk.eyJ1IjoiYmFuYW5hc2EiLCJhIjoiY2sxd2gzb2RhMDFtbTNscGc4ZTljand5ayJ9.v5zgfYiieJkyambXSqo-Sw';
@@ -35,7 +62,7 @@
 
 	  map.addSource('trees', {
 		type: 'geojson',
-		data: 'http://34.252.164.246/geoJson/?query=SELECT%20Longitude,%20Latitude,%20MAX(Ozone)%20FROM%20Aerosols_cd%20GROUP%20BY%20toDate(DateTime),%20Longitude,%20Latitude%20LIMIT%2010000'
+		data: 'http://34.252.164.246/geoJson/?query=SELECT%20Longitude,%20Latitude,%20MAX(Ozone)%20FROM%20Aerosols_cd%20WHERE%20toDate(DateTime)=toDate(\'' + $("#datepicker").val() + '\')%20GROUP%20BY%20toDate(DateTime),%20Longitude,%20Latitude%20LIMIT%2010000'
 	});
 
 	map.addLayer({
