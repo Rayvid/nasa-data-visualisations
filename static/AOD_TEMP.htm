@@ -85,7 +85,11 @@
 		data: 'http://34.252.164.246/geoJson/?query=SELECT%20LON,%20LAT,%20MAX(TEMP)%20FROM%20Meteo_bananasa%20WHERE%20TEMP%20<>%20-99%20AND%20toDate(DATE)=toDate(\'' + $("#datepicker").val() + '\')%20GROUP%20BY%20toDate(DATE),%20LON,%20LAT%20LIMIT%2010000'
 	});
 
-
+	  map.addSource('wind', {
+		type: 'geojson',
+		data: 'http://34.252.164.246/geoJson/?query=SELECT%20LON%252btoDecimal128(0.25,10),%20LAT%252btoDecimal128(0.25,10),%20MAX(WIND)%20FROM%20Meteo_bananasa%20WHERE%20WIND%20<>%20-999%20AND%20toDate(DATE)=toDate(\'' + $("#datepicker").val() + '\')%20GROUP%20BY%20toDate(DATE),%20LON,%20LAT%20LIMIT%2010000'
+	});
+	
 	map.addLayer({
 		id: 'dbh-temp',
 		type: 'circle',
@@ -183,6 +187,56 @@
 			'circle-translate': [0, 0]
 		}
 		});
+
+	map.addLayer({
+		id: 'dbh-wind',
+		type: 'circle',
+		source: 'wind',
+		layout: {visibility: 'visible'},
+		paint: {
+			'circle-color': [
+				'interpolate',
+				['linear'],
+				['get', 'dbh'],
+				0,
+				'white',
+				0.5,
+				'cyan',
+				1,
+				'lightblue',
+				5,
+				'blue',
+				10,
+				'darkblue'
+
+			],
+			'circle-opacity': [
+				'interpolate',
+				['linear'],
+				['zoom'],
+				0,
+				0.6,
+				22,
+				0.1
+			],
+			'circle-radius': [
+				'interpolate',
+				['linear'],
+				['get', 'dbh'],
+				0,
+				5,
+				0.6,
+				7,
+				0.9,
+				10,
+				2,
+				15
+			],
+			'circle-blur': 0.5,
+			'circle-translate': [0, 0]
+		}
+		});
+
 
 	map.addLayer({
 		id: 'dbh-label',
