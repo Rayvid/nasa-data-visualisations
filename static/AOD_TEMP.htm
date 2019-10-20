@@ -28,17 +28,30 @@
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
+	  var reload = function() {
+			var urlParams = new URLSearchParams(window.location.search);
+			urlParams.delete('date');
+			urlParams.append('date', $("#datepicker").val());
+			urlParams.delete('zoom');
+			urlParams.append('zoom', map.getZoom());
+			urlParams.delete('lat');
+			urlParams.append('lat', map.getCenter().lat);
+			urlParams.delete('lng');
+			urlParams.append('lng', map.getCenter().lng);
+			window.location.href = window.location.pathname + '?' + urlParams.toString();
+		};
+	
+	  Date.prototype.addDays=function(d){return new Date(this.valueOf()+864E5*d);};
       $(() => {
+		$("#fwd").click(function () {
+			$("#datepicker").val((new Date($("#datepicker").val())).addDays(1).toISOString().substr(0, 10));
+			reload();
+		});
 		$("#datepicker").datepicker();
         $("#datepicker").datepicker("option", "dateFormat", "yy-mm-dd");
 		var urlParams = new URLSearchParams(window.location.search);
 		$("#datepicker").val(urlParams.get('date') || '2016-02-14');
-		$("#datepicker").change(function() {
-			var urlParams = new URLSearchParams(window.location.search);
-			urlParams.delete('date');
-			urlParams.append('date', $("#datepicker").val());
-			window.location.href = window.location.pathname + '?' + urlParams.toString();
-		});
+		$("#datepicker").change(reload);
       });
   </script>
 </head>
@@ -46,16 +59,18 @@
   <div class="mapcontrol" style="top:20px;left:20px">
     Date:
 	<input type="text" id="datepicker" size="30">
+	<button id="fwd">></button>
   </div>
 	
   <div id='map'></div>
   <script>
+	var urlParams = new URLSearchParams(window.location.search);
     mapboxgl.accessToken = 'pk.eyJ1IjoiYmFuYW5hc2EiLCJhIjoiY2sxd2gzb2RhMDFtbTNscGc4ZTljand5ayJ9.v5zgfYiieJkyambXSqo-Sw';
     var map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/light-v10?optimize=true',
-      center: [-40.695633, 36.059993],
-      zoom: 2
+      center: [urlParams.get('lng') || -40.695633, urlParams.get('lat') || 36.059993],
+      zoom: urlParams.get('zoom') || 2.5
     });
 
 	map.on('load', function() {
@@ -132,9 +147,9 @@
 				['get', 'dbh'],
 				0,
 				'white',
-				0.3,
-				'rgb(224, 224, 224)',
-				0.9,
+				0.2,
+				'rgb(224, 224, 255)',
+				0.5,
 				'lightgrey',
 				2,
 				'grey',
@@ -157,7 +172,7 @@
 				['get', 'dbh'],
 				0,
 				10,
-				0.3,
+				0.6,
 				20,
 				0.9,
 				25,
