@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>MapBox Heatmap</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+	  
+	  .mapcontrol {
+		position: absolute;
+		z-index: 10;
+	  }
+    </style>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+      $(() => {
+		$("#datepicker").datepicker();
+        $("#datepicker").datepicker("option", "dateFormat", "yy-mm-dd");
+		var urlParams = new URLSearchParams(window.location.search);
+		$("#datepicker").val(urlParams.get('date') || '2016-02-14');
+		$("#datepicker").change(function() {
+			var urlParams = new URLSearchParams(window.location.search);
+			urlParams.delete('date');
+			urlParams.append('date', $("#datepicker").val());
+			window.location.href = window.location.pathname + '?' + urlParams.toString();
+		});
+      });
+  </script>
+</head>
+<body>
+  <div class="mapcontrol" style="top:20px;left:20px">
+    Date:
+	<input type="text" id="datepicker" size="30">
+  </div>
+	
+  <div id='map'></div>
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYmFuYW5hc2EiLCJhIjoiY2sxd2gzb2RhMDFtbTNscGc4ZTljand5ayJ9.v5zgfYiieJkyambXSqo-Sw';
+    var map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/light-v10?optimize=true',
+      center: [-40.695633, 36.059993],
+      zoom: 2.5
+    });
+
+	map.on('load', function() {
+
+	  map.addSource('trees', {
+		type: 'geojson',
+		data: 'http://34.252.164.246/geoJson/?query=SELECT%20Longitude,%20Latitude,%20MAX(NO2)%20FROM%20Aerosols_cd%20WHERE%20toDate(DateTime)=toDate(\'' + $("#datepicker").val() + '\')%20GROUP%20BY%20toDate(DateTime),%20Longitude,%20Latitude%20LIMIT%2010000'
+	});
+
+	map.addLayer({
+		id: 'dbh-label',
+		type: 'symbol',
+		source: 'trees',
+		layout: {
+			'text-size': 12,
+			'text-field': [
+                    "step",
+                    ["zoom"],
+                    "",
+                    4,
+                    ["to-string", ["max", ["get", "dbh"]]]
+                ],
+			
+			visibility: 'visible'
+		},
+		paint: {}
+		});
+	map.addLayer({
+		id: 'dbh-color',
+		type: 'circle',
+		source: 'trees',
+		layout: {visibility: 'visible'},
+		paint: {
+			'circle-color': [
+				'interpolate',
+				['linear'],
+				['get', 'dbh'],
+				0.05,
+				'cyan',
+				0.3,
+				'yellow',
+				0.7,
+				'red'
+			],
+			'circle-opacity': [
+				'interpolate',
+				['linear'],
+				['zoom'],
+				0,
+				0.9,
+				22,
+				0.1
+			],
+			'circle-radius': [
+				'interpolate',
+				['linear'],
+				['get', 'dbh'],
+				0.05,
+				10,
+				0.3,
+				20,
+				0.6,
+				30,
+				0.9,
+				40
+			],
+			'circle-blur': 0.5,
+			'circle-translate': [0, 0]
+		}
+		});
+
+  // add circle layer here
+	});
+
+
+  </script>
+</body>
+</html>
