@@ -77,9 +77,112 @@
 
 	  map.addSource('trees', {
 		type: 'geojson',
-		data: 'http://34.252.164.246/geoJson/?query=SELECT%20Longitude,%20Latitude,%20MAX(Ozone)%20FROM%20Aerosols_cd%20WHERE%20toDate(DateTime)=toDate(\'' + $("#datepicker").val() + '\')%20GROUP%20BY%20toDate(DateTime),%20Longitude,%20Latitude%20LIMIT%2010000'
+		data: 'http://34.252.164.246/geoJson/?query=SELECT%20LON,%20LAT,%20MAX(PRECTOT)%20FROM%20Meteo_bananasa%20WHERE%20TEMP%20<>%20-99%20AND%20toDate(DATE)=toDate(\'' + $("#datepicker").val() + '\')%20GROUP%20BY%20toDate(DATE),%20LON,%20LAT%20LIMIT%2010000'
 	});
 	
+	  map.addSource('temp', {
+		type: 'geojson',
+		data: 'http://34.252.164.246/geoJson/?query=SELECT%20LON%252btoDecimal128(0.25,10),%20LAT%252btoDecimal128(0.25,10),%20MAX(TEMP)%20FROM%20Meteo_bananasa%20WHERE%20TEMP%20<>%20-99%20AND%20toDate(DATE)=toDate(\'' + $("#datepicker").val() + '\')%20GROUP%20BY%20toDate(DATE),%20LON,%20LAT%20LIMIT%2010000'
+	});
+
+	map.addLayer({
+		id: 'dbh-temp',
+		type: 'circle',
+		source: 'temp',
+		layout: {visibility: 'visible'},
+		paint: {
+			'circle-color': [
+				'interpolate',
+				['linear'],
+				['get', 'dbh'],
+				-30,
+				'blue',
+				0,
+				'cyan',
+				20,
+				'yellow',
+				30,
+				'orange',
+				40,
+				'red'
+
+			],
+			'circle-opacity': [
+				'interpolate',
+				['linear'],
+				['zoom'],
+				0,
+				0.01,
+				22,
+				0.5
+			],
+			'circle-radius': [
+				'interpolate',
+				['linear'],
+				['get', 'dbh'],
+				-20,
+				10,
+				0,
+				20,
+				20,
+				25,
+				30,
+				30
+			],
+			'circle-blur': 0.5,
+			'circle-translate': [0, 0]
+		}
+		});
+
+	map.addLayer({
+		id: 'dbh-color',
+		type: 'circle',
+		source: 'trees',
+		layout: {visibility: 'visible'},
+		paint: {
+			'circle-color': [
+				'interpolate',
+				['linear'],
+				['get', 'dbh'],
+				0,
+				'white',
+				0.3,
+				'rgb(224, 224, 224)',
+				10,
+				'cyan',
+				50,
+				'lightblue',
+				100,
+				'blue'
+
+			],
+			'circle-opacity': [
+				'interpolate',
+				['linear'],
+				['zoom'],
+				0,
+				0.5,
+				22,
+				0.1
+			],
+			'circle-radius': [
+				'interpolate',
+				['linear'],
+				['get', 'dbh'],
+				0,
+				10,
+				0.3,
+				20,
+				0.9,
+				25,
+				2,
+				30
+			],
+			'circle-blur': 0.5,
+			'circle-translate': [0, 0]
+		}
+		});
+
 	map.addLayer({
 		id: 'dbh-label',
 		type: 'symbol',
@@ -98,60 +201,12 @@
 		},
 		paint: {}
 		});
-		
-		
-	map.addLayer({
-		id: 'dbh-color',
-		type: 'circle',
-		source: 'trees',
-		layout: {visibility: 'visible'},
-		paint: {
-			'circle-color': [
-				'interpolate',
-				['linear'],
-				['get', 'dbh'],
-				0,
-				'white',
-				200,
-				'royalblue',
-				300,
-				'cyan',
-				320,
-				'yellow',
-				380,
-				'red'
-			],
-			'circle-opacity': [
-				'interpolate',
-				['linear'],
-				['zoom'],
-				0,
-				0.9,
-				22,
-				0.1
-			],
-			'circle-radius': [
-				'interpolate',
-				['linear'],
-				['get', 'dbh'],
-				200,
-				10,
-				300,
-				20,
-				400,
-				30,
-				500,
-				40
-			],
-			'circle-blur': 0.5,
-			'circle-translate': [0, 0]
-		}
-		});
-
   // add circle layer here
+
+
+
+
 	});
-
-
   </script>
 </body>
 </html>
