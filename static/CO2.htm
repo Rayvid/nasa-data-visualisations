@@ -54,15 +54,15 @@
     var map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/light-v10?optimize=true',
-      center: [-40.695633, 36.059993],
-      zoom: 2.5
+      center: [-118.323967, 33.977611],
+      zoom: 8.5
     });
 
 	map.on('load', function() {
 
 	  map.addSource('trees', {
 		type: 'geojson',
-		data: 'http://34.252.164.246/geoJson/?query=SELECT%20Longitude,%20Latitude,%20MAX(Ozone)%20FROM%20Aerosols_cd%20WHERE%20toDate(DateTime)=toDate(\'' + $("#datepicker").val() + '\')%20GROUP%20BY%20toDate(DateTime),%20Longitude,%20Latitude%20LIMIT%2010000'
+		data: 'http://34.252.164.246/geoJson/?query=SELECT%20Longitude,%20Latitude,%20MAX(toDecimal64(SampleMeasurement,10))%20FROM%20AirQualitySystem_cd%20WHERE%20toDate(DateTime)=toDate(\'' + $("#datepicker").val() + '\')%20GROUP%20BY%20toDate(DateTime),%20Longitude,%20Latitude%20LIMIT%2010000'
 	});
 
 	map.addLayer({
@@ -75,7 +75,7 @@
                     "step",
                     ["zoom"],
                     "",
-                    4,
+                    9,
                     ["to-string", ["min", ["get", "dbh"]]]
                 ],
 			
@@ -83,7 +83,6 @@
 		},
 		paint: {}
 		});
-
 
 	map.addLayer({
 	  id: 'trees-heat',
@@ -112,13 +111,13 @@
 			'interpolate',
 			['linear'],
 			['get','dbh'],
-			200,
+			-20,
 			10,
-			300,
+			0,
+			10,
 			20,
-			400,
-			30,
-			500,
+			20,
+			40,
 			40
 		  ]
 		,
@@ -132,13 +131,14 @@
 		  22,
 		  0.9
 		],
+
 	  }
 	}, 'waterway-label');
 
+
   // add circle layer here
+
 	});
-
-
   </script>
 </body>
 </html>

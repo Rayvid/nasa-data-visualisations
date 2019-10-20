@@ -62,7 +62,7 @@
 
 	  map.addSource('trees', {
 		type: 'geojson',
-		data: 'http://34.252.164.246/geoJson/?query=SELECT%20Longitude,%20Latitude,%20MAX(Ozone)%20FROM%20Aerosols_cd%20WHERE%20toDate(DateTime)=toDate(\'' + $("#datepicker").val() + '\')%20GROUP%20BY%20toDate(DateTime),%20Longitude,%20Latitude%20LIMIT%2010000'
+		data: 'http://34.252.164.246/geoJson/?query=SELECT%20Longitude,%20Latitude,%20MAX(NO2)%20FROM%20Aerosols_cd%20WHERE%20toDate(DateTime)=toDate(\'' + $("#datepicker").val() + '\')%20GROUP%20BY%20toDate(DateTime),%20Longitude,%20Latitude%20LIMIT%2010000'
 	});
 
 	map.addLayer({
@@ -76,7 +76,7 @@
                     ["zoom"],
                     "",
                     4,
-                    ["to-string", ["min", ["get", "dbh"]]]
+                    ["to-string", ["max", ["get", "dbh"]]]
                 ],
 			
 			visibility: 'visible'
@@ -112,13 +112,13 @@
 			'interpolate',
 			['linear'],
 			['get','dbh'],
-			200,
+			0.05,
 			10,
-			300,
+			0.3,
 			20,
-			400,
+			0.6,
 			30,
-			500,
+			0.9,
 			40
 		  ]
 		,

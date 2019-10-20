@@ -64,7 +64,7 @@
 		type: 'geojson',
 		data: 'http://34.252.164.246/geoJson/?query=SELECT%20Longitude,%20Latitude,%20MAX(Ozone)%20FROM%20Aerosols_cd%20WHERE%20toDate(DateTime)=toDate(\'' + $("#datepicker").val() + '\')%20GROUP%20BY%20toDate(DateTime),%20Longitude,%20Latitude%20LIMIT%2010000'
 	});
-
+	
 	map.addLayer({
 		id: 'dbh-label',
 		type: 'symbol',
@@ -83,57 +83,55 @@
 		},
 		paint: {}
 		});
-
-
+		
+		
 	map.addLayer({
-	  id: 'trees-heat',
-	  type: 'heatmap',
-	  source: 'trees',
-	  maxzoom: 15,
-	  paint: {
-		// increase weight as diameter breast height increases
-		'heatmap-weight': 2,
-		// increase intensity as zoom level increases
-		'heatmap-intensity': 2,
-		// assign color values be applied to points depending on their density
-		'heatmap-color': [
-		  'interpolate',
-		  ['linear'],
-		  ['heatmap-density'],
-		  0, 'rgba(0, 0, 255, 0)',
-		  0.2, 'royalblue',
-		  0.3, 'cyan',
-		  0.5, 'lime',
-		  0.7, 'yellow',
-		  1, 'red'
-		],
-		// increase radius as zoom increases
-		'heatmap-radius': [
-			'interpolate',
-			['linear'],
-			['get','dbh'],
-			200,
-			10,
-			300,
-			20,
-			400,
-			30,
-			500,
-			40
-		  ]
-		,
-		// decrease opacity to transition into the circle layer
-		'heatmap-opacity': [
-		  'interpolate',
-		  ['linear'],
-		  ['zoom'],
-		  0,
-		  0.5,
-		  22,
-		  0.9
-		],
-	  }
-	}, 'waterway-label');
+		id: 'dbh-color',
+		type: 'circle',
+		source: 'trees',
+		layout: {visibility: 'visible'},
+		paint: {
+			'circle-color': [
+				'interpolate',
+				['linear'],
+				['get', 'dbh'],
+				0,
+				'white',
+				200,
+				'royalblue',
+				300,
+				'cyan',
+				320,
+				'yellow',
+				380,
+				'red'
+			],
+			'circle-opacity': [
+				'interpolate',
+				['linear'],
+				['zoom'],
+				0,
+				0.9,
+				22,
+				0.1
+			],
+			'circle-radius': [
+				'interpolate',
+				['linear'],
+				['get', 'dbh'],
+				200,
+				10,
+				300,
+				20,
+				400,
+				30,
+				500,
+				40
+			],
+			'circle-blur': 0.5,
+			'circle-translate': [0, 0]
+		}
+		});
 
   // add circle layer here
 	});
